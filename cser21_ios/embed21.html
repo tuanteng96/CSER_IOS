@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width initial-scale=1.0 maximum-scale=1.0 user-scalable=yes" />
+    <title></title>
+    <meta http-equiv="Content-Language" content="vi" />
+    <link rel="stylesheet" href="https://cser.vn/app2021/css/app.css" />
+    <style type="text/css">
+        *, ::after, ::before {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #212529;
+            text-align: left;
+            background-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow:hidden
+        }
+        
+        #preload {
+                    position:fixed;
+                    top: 0;
+                    width:100%;
+                    height:100%;
+                    opacity:1;
+                    z-index:100001;
+                    background:#ff898d
+                }
+                 #preload img {
+                    width: 200px;
+                     max-width: 90%;
+                     position: absolute;
+                     top: calc(50% - 25px);
+                     left: 50%;
+                     transform: translateX(-50%) translateY(-50%);
+                }
+                 #preload .progress {
+                    position: absolute;
+                     left: 50%;
+                     bottom: 50px;
+                     width: 80%;
+                     height: 4px;
+                     background: rgba(255,255,255,0.5);
+                     border-radius: 10px;
+                     transform: translateX(-50%);
+                     overflow: hidden;
+                }
+                #preload .progress-text {
+                    position: absolute;
+                    bottom: 35px;
+                    text-align: center;
+                    left: 0;
+                    width: 100%;
+                    color: #fff;
+                    font-size: 16px;
+                }
+                 #preload .progress .progress-line {
+                     width: auto;
+                     height: 4px;
+                     background: #fff;
+                     position: absolute;
+                     top: 0;
+                     left: 0;
+                     transition: width .6s ease;
+                }
+        
+    </style>
+
+    <style>
+        /*{{app}}*/
+    </style>
+
+   
+
+    <script>
+        /**
+         * Mỗi khi Người dùng bấm nút back trên dt
+         * ANDROID_ONBACK sẽ đc thực thị
+         */
+        var ANDROID_ONBACK = function () {
+            if (!window.ANDROID) return;
+            if (!ANDROID.IsNoBack) {
+                document.getElementById('ANDROID_ONBACK_MESS').style.display = 'block';
+            }
+
+        }
+        var ANDROID_HIDE = function () {
+            window.ANDROID && ANDROID.NoBack(true);
+            document.getElementById('ANDROID_ONBACK_MESS').style.display = 'none';
+        }
+        
+        var NEW_APP = true;
+
+    </script>
+</head>
+<body>
+    <div id="preload">
+        <div class="progress-logo">
+            <img src="https://cser.vn/app/images/logo-app.png">
+        </div>
+        <div class="progress-text">
+            Vui lòng chờ trong giây lát ...
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        var timerId, percent;
+        percent = 0;
+        window.onload = function() {
+            
+            var preload = document.getElementById("preload");
+            
+            timerId = setInterval(function () {
+
+                percent += 0.5;
+
+                // complete
+                if (percent >= 100) {
+                    clearInterval(timerId);
+                    preload.remove();
+                }
+
+            }, 300);
+        }
+        
+        var PREV_ERROR = false;
+        function ERROR() {
+            PREV_ERROR = true;
+            PREPARE();
+            
+            //LOADER21s.innerHTML = '<div class="preloaderEzs"></div>';
+        }
+        function PREPARE() {
+            
+            
+            var ANDROID_ONBACK_MESS = document.getElementById('ANDROID_ONBACK_MESS');
+            if (!ANDROID_ONBACK_MESS) {
+                ANDROID_ONBACK_MESS = document.createElement('div');
+                ANDROID_ONBACK_MESS.id = "ANDROID_ONBACK_MESS";
+                ANDROID_ONBACK_MESS.innerHTML = 'Bấm thêm lần nữa để thoát';
+                document.body.appendChild(ANDROID_ONBACK_MESS);
+            }
+        }
+
+        var VER = '1001';
+
+
+
+        /**
+         * gửi yêu cầu tới app IOS || app Android
+         */
+        function app_request(cmd, value) {
+            if (window['ANDROID'])
+                ANDROID.Do(cmd, value);
+            else
+                window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.IOS.postMessage({
+                    "cmd": cmd,
+                    "value": value
+                })
+        }
+
+        /**
+         * App trả lời
+         */
+        function app_response(cmd, value) {
+
+
+        }
+
+
+
+
+        function box(fn) {
+            try {
+                fn && fn();
+            } catch (e) {
+
+            }
+        }
+
+        const SCRIPT_START = 'SCRIPT_START';
+        const SCRIPT_INDEX = 'SCRIPT_INDEX';
+
+
+
+        function __embedJs(s) {
+            var t = document.createElement('script');
+            t.innerHTML = s;
+            document.body.appendChild(t);
+        }
+
+        /*
+         prepare function
+         */
+        var LOADER21 = document.querySelector('.LOADER21');
+        function COUNTDOWN(N) {
+
+        }
+        function STATUS() {
+
+        }
+
+        /* function CLEAR_LOADER() {
+            ['.splash','.LOADER21'].forEach(function (el) {
+                box(() => {
+                    document.querySelector(el).remove();
+                })
+            })
+            
+        } */
+
+        /*
+         Step1: SCRIPT_START
+         */
+        box(() => {
+            var n = SCRIPT_START;
+            var s = localStorage.getItem(n);
+            if (n) {
+                __embedJs(s);
+            }
+        });
+
+        /*
+         Step2: SCRIPT_INDEX
+         */
+        box(() => {
+
+            var link = 'https://cser.vn/app2021/index.aspx';
+            var N = 5;
+            var isShowLoader = false;
+            /* var showLoaderInv = setTimeout(function () {
+                isShowLoader = true;
+            }, 1000); */
+
+            function countDown() {
+                /* LOADER21.innerHTML = "disconnected! try again after(" + N + 's)';
+                document.body.setAttribute('data-status', 'COUNTDOWN'); */
+
+
+                /* if (N == 0) {
+                    COUNTDOWN(N);
+                    get();
+                } else {
+                    setTimeout(function () {
+                        N = N - 1;
+                        COUNTDOWN(N);
+                        countDown();
+                    }, 1000);
+                } */
+            }
+            function init(script) {
+                /* clearTimeout(showLoaderInv); */
+                __embedJs(script);
+                /* if (!isShowLoader) {
+                    __embedJs(script);
+
+                } else {
+                    //để trách nhấp nháy
+                    setTimeout(function () {
+                        __embedJs(script);
+
+                    }, 1000)
+                } */
+
+
+            }
+            function err() {
+                var script = localStorage.getItem(SCRIPT_INDEX);
+                if (script) {
+                    init(script);
+                } else {
+                    /* setTimeout(function () {
+                        LOADER21.innerHTML = "disconnected! try again...";
+                        document.body.setAttribute('data-status', 'BEGIN');
+                        N = 5;
+                        countDown();
+
+                    }, 1000); */
+                }
+            }
+
+            function get() {
+                /* LOADER21.innerHTML =  "connecting...";
+                document.body.setAttribute('data-status', 'CONNECTING'); */
+                fetch(link)
+                    .then((data) => {
+
+                        if (data.status === 200) {
+                            data.text().then(function (script) {
+                                localStorage.setItem(SCRIPT_INDEX, script);
+                                init(script);
+                            })
+                        } else err();
+
+                    }).catch((error) => {
+                        err();
+                    });
+            }
+            get();
+
+            //Webview visiable
+            app_request("call", JSON.stringify({ sub_cmd: 'WV_VISIBLE', sub_cmd_id: -999, params: '1' }));
+
+        });
+
+    </script>
+</body>
+</html>
