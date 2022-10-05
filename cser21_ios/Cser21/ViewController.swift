@@ -544,6 +544,7 @@ class ViewController: UIViewController,WKScriptMessageHandler,UIGestureRecognize
             //
             
             wv = WKWebView(frame: frm, configuration: webConfiguration);
+            wv.scrollView.backgroundColor = .clear
             
             //setBackground(params: nil);
             //view.backgroundColor = bg;
