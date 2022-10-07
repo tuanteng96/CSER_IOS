@@ -543,8 +543,16 @@ class ViewController: UIViewController,WKScriptMessageHandler,UIGestureRecognize
             webConfiguration.setURLSchemeHandler(LocalSchemeHandler(), forURLScheme: "app21")
             //
             
-            wv = WKWebView(frame: frm, configuration: webConfiguration);
-            wv.scrollView.backgroundColor = .clear
+            wv = WKWebView(frame: .zero, configuration: webConfiguration)
+            view.addSubview(wv)
+            wv.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                wv.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                view.trailingAnchor.constraint(equalTo: wv.trailingAnchor),
+                wv.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+                view.bottomAnchor.constraint(equalTo: wv.bottomAnchor)
+            ])
+            //wv.scrollView.backgroundColor = .clear
             
             //setBackground(params: nil);
             //view.backgroundColor = bg;
