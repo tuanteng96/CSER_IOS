@@ -12,7 +12,7 @@ import Firebase
 import MapKit
 import CoreLocation
 import AVFoundation
-class ViewController: UIViewController,WKScriptMessageHandler,UIGestureRecognizerDelegate,CLLocationManagerDelegate ,AVAudioRecorderDelegate   {
+class ViewController: UIViewController,WKScriptMessageHandler,UIGestureRecognizerDelegate,CLLocationManagerDelegate ,AVAudioRecorderDelegate ,WKNavigationDelegate  {
 
     let HTML_EMBED = "embed21"
     let domain = "https://cser.vn/";
@@ -69,10 +69,10 @@ class ViewController: UIViewController,WKScriptMessageHandler,UIGestureRecognize
     
     
     //
-    @IBOutlet weak var uv: UIWebView!
+    @IBOutlet weak var wv: WKWebView!
     
     //@IBOutlet weak var wv: WKWebView!
-    var wv: WKWebView!
+//    var wv: WKWebView!
     
     var os10:Bool = false;
     
@@ -155,7 +155,7 @@ class ViewController: UIViewController,WKScriptMessageHandler,UIGestureRecognize
     }
     func StrSize() -> String
     {
-        let s = os10 ? uv.bounds.size : wv.bounds.size
+        let s = wv.bounds.size
         let statusBarHeight = UIApplication.shared.statusBarFrame.height
         return "{\"width\":" + String(describing: s.width) + ",\"height\":" + String(describing: s.height - statusBarHeight ) + "}"
     }
@@ -184,7 +184,7 @@ class ViewController: UIViewController,WKScriptMessageHandler,UIGestureRecognize
     @objc func onTap(g: UITapGestureRecognizer) {
         
         var value:String = "";
-        value += "{\"point\":" + StrPoint(Point: g.location(in: os10 ? uv : wv)) ;
+        value += "{\"point\":" + StrPoint(Point: g.location(in: wv)) ;
         value += ",\"size\":" + StrSize();
         value += ",\"state\":" + StrGestureState(state: g.state);
         value += "}";
@@ -202,7 +202,7 @@ class ViewController: UIViewController,WKScriptMessageHandler,UIGestureRecognize
     }
     @objc func onRotation(g: UIRotationGestureRecognizer) {
         var value:String = "";
-        value += "{\"point\":" + StrPoint(Point: g.location(in: os10 ? uv : wv)) ;
+        value += "{\"point\":" + StrPoint(Point: g.location(in:  wv)) ;
         value += ",\"rotation\":" + String(describing: g.rotation);
         value += ",\"velocity\":" + String(describing: g.velocity);
         value += ",\"size\":" + StrSize();
@@ -212,9 +212,9 @@ class ViewController: UIViewController,WKScriptMessageHandler,UIGestureRecognize
     }
     @objc func onPan(g: UIPanGestureRecognizer) {
         var value:String = "";
-        value += "{\"point\":" + StrPoint(Point: g.location(in: os10 ? uv : wv)) ;
-        value += ",\"translation\":" + StrPoint(Point: g.translation(in: os10 ? uv : wv));
-        value += ",\"velocity\":" + StrPoint(Point: g.velocity(in: os10 ? uv : wv));
+        value += "{\"point\":" + StrPoint(Point: g.location(in: wv)) ;
+        value += ",\"translation\":" + StrPoint(Point: g.translation(in:  wv));
+        value += ",\"velocity\":" + StrPoint(Point: g.velocity(in: wv));
         value += ",\"size\":" + StrSize();
         value += ",\"state\":" + StrGestureState(state: g.state);
         value += "}";
@@ -222,9 +222,9 @@ class ViewController: UIViewController,WKScriptMessageHandler,UIGestureRecognize
     }
     @objc func onEPan(g: UIScreenEdgePanGestureRecognizer) {
         var value:String = "";
-        value += "{\"point\":" + StrPoint(Point: g.location(in: os10 ? uv : wv)) ;
-        value += ",\"translation\":" + StrPoint(Point: g.translation(in: os10 ? uv : wv));
-        value += ",\"velocity\":" + StrPoint(Point: g.velocity(in: os10 ? uv : wv));
+        value += "{\"point\":" + StrPoint(Point: g.location(in: wv)) ;
+        value += ",\"translation\":" + StrPoint(Point: g.translation(in:  wv));
+        value += ",\"velocity\":" + StrPoint(Point: g.velocity(in: wv));
         value += ",\"size\":" + StrSize();
         value += ",\"state\":" + StrGestureState(state: g.state);
         value += "}";
@@ -232,7 +232,7 @@ class ViewController: UIViewController,WKScriptMessageHandler,UIGestureRecognize
     }
     @objc func onSwipe(g: UISwipeGestureRecognizer) {
         var value:String = "";
-        value += "{\"point\":" + StrPoint(Point: g.location(in: os10 ? uv : wv)) ;
+        value += "{\"point\":" + StrPoint(Point: g.location(in: wv)) ;
         value += ",\"direction\":" + String(describing: g.direction.rawValue);
         value += ",\"size\":" + StrSize();
         value += ",\"state\":" + StrGestureState(state: g.state);
@@ -241,7 +241,7 @@ class ViewController: UIViewController,WKScriptMessageHandler,UIGestureRecognize
     }
     @objc func onLongpress(g: UILongPressGestureRecognizer) {
         var value:String = "";
-        value += "{\"point\":" + StrPoint(Point: g.location(in: os10 ? uv : wv)) ;
+        value += "{\"point\":" + StrPoint(Point: g.location(in:wv)) ;
         value += ",\"size\":" + StrSize();
         value += ",\"state\":" + StrGestureState(state: g.state);
         value += "}";
@@ -305,13 +305,14 @@ class ViewController: UIViewController,WKScriptMessageHandler,UIGestureRecognize
     //MARK: - evalJs
     func evalJs(str: String)
     {
-        if(os10){
-            //uv.loadRequest(<#T##request: URLRequest##URLRequest#>)("app_response('\(cmd)','\(value)',true)",completionHandler: nil)
-            //let str:String = "javascript:app_response('\(cmd)','\(value)',true);";
-            uv.stringByEvaluatingJavaScript(from: str)
-        }else{
-            wv.evaluateJavaScript(str,completionHandler: nil)
-        }
+        wv.evaluateJavaScript(str,completionHandler: nil)
+
+//        if(os10){
+//            //uv.loadRequest(<#T##request: URLRequest##URLRequest#>)("app_response('\(cmd)','\(value)',true)",completionHandler: nil)
+//            //let str:String = "javascript:app_response('\(cmd)','\(value)',true);";
+//            uv.evaluateJavaScript( str)
+//        }else{
+//        }
         
     }
     
@@ -387,73 +388,98 @@ class ViewController: UIViewController,WKScriptMessageHandler,UIGestureRecognize
     }
     
     
-    func ios10() {
-        //always set 0
-        //IconBadgeNumber(strNum: "0");
-        //Javascript
-        //uv.configuration.userContentController.add(self, name: "IOS")
-        
-        
-        uv.scrollView.decelerationRate = UIScrollView.DecelerationRate.normal;
-        //CGSize viewSize = self.view.frame.size
-        uv.window?.sizeToFit()
-        //Event
-        //#
-        let evt_tap = UITapGestureRecognizer(target: self , action: #selector(onTap))
-        evt_tap.delegate = self
-        evt_tap.numberOfTapsRequired = 1
-        uv.addGestureRecognizer(evt_tap)
-        //#
-        let evt_pinch = UIPinchGestureRecognizer(target: self , action: #selector(onPinch))
-        evt_pinch.delegate = self
-        uv.addGestureRecognizer(evt_pinch)
-        //#
-        let evt_Rotation = UIRotationGestureRecognizer(target: self , action: #selector(onRotation))
-        evt_Rotation.delegate = self
-        uv.addGestureRecognizer(evt_Rotation)
-        //#
-        let evt_Pan = UIPanGestureRecognizer(target: self , action: #selector(onPan))
-        evt_Pan.delegate = self
-        uv.addGestureRecognizer(evt_Pan)
-        //#
-        let evt_Epan = UIScreenEdgePanGestureRecognizer(target: self , action: #selector(onEPan))
-        evt_Epan.delegate = self
-        uv.addGestureRecognizer(evt_Epan)
-        //#
-        let evt_Swipe = UISwipeGestureRecognizer(target: self , action: #selector(onSwipe))
-        evt_Swipe.delegate = self
-        uv.addGestureRecognizer(evt_Swipe)
-        //#
-        let evt_Longpress = UILongPressGestureRecognizer(target: self , action: #selector(onLongpress))
-        evt_Longpress.delegate = self
-        uv.addGestureRecognizer(evt_Longpress)
-        
-        
-        //UI
-        
-        // Do any additional setup after loading the view, typically from a nib.
-        
-        // load embed.html
-        if let path = Bundle.main.path(forResource: HTML_EMBED , ofType: "html"){
-            let fm = FileManager()
-            let exists = fm.fileExists(atPath: path)
-            if(exists){
-                let c = fm.contents(atPath: path)
-                let cString = NSString(data: c!, encoding: String.Encoding.utf8.rawValue)
-                
-                let url = URL(string: domain)
-                
-                var html:String = "<st";
-                html +=  cString! as String
-                uv.loadHTMLString(html, baseURL: url)
-            }
-            //test
-            
-        }
-    }
-    
+//    func ios10() {
+//        //always set 0
+//        //IconBadgeNumber(strNum: "0");
+//        //Javascript
+//        //uv.configuration.userContentController.add(self, name: "IOS")
+//
+//
+//        uv.scrollView.decelerationRate = UIScrollView.DecelerationRate.normal;
+//        //CGSize viewSize = self.view.frame.size
+//        uv.window?.sizeToFit()
+//        //Event
+//        //#
+//        let evt_tap = UITapGestureRecognizer(target: self , action: #selector(onTap))
+//        evt_tap.delegate = self
+//        evt_tap.numberOfTapsRequired = 1
+//        uv.addGestureRecognizer(evt_tap)
+//        //#
+//        let evt_pinch = UIPinchGestureRecognizer(target: self , action: #selector(onPinch))
+//        evt_pinch.delegate = self
+//        uv.addGestureRecognizer(evt_pinch)
+//        //#
+//        let evt_Rotation = UIRotationGestureRecognizer(target: self , action: #selector(onRotation))
+//        evt_Rotation.delegate = self
+//        uv.addGestureRecognizer(evt_Rotation)
+//        //#
+//        let evt_Pan = UIPanGestureRecognizer(target: self , action: #selector(onPan))
+//        evt_Pan.delegate = self
+//        uv.addGestureRecognizer(evt_Pan)
+//        //#
+//        let evt_Epan = UIScreenEdgePanGestureRecognizer(target: self , action: #selector(onEPan))
+//        evt_Epan.delegate = self
+//        uv.addGestureRecognizer(evt_Epan)
+//        //#
+//        let evt_Swipe = UISwipeGestureRecognizer(target: self , action: #selector(onSwipe))
+//        evt_Swipe.delegate = self
+//        uv.addGestureRecognizer(evt_Swipe)
+//        //#
+//        let evt_Longpress = UILongPressGestureRecognizer(target: self , action: #selector(onLongpress))
+//        evt_Longpress.delegate = self
+//        uv.addGestureRecognizer(evt_Longpress)
+//
+//
+//        //UI
+//
+//        // Do any additional setup after loading the view, typically from a nib.
+//
+//        // load embed.html
+//        if let path = Bundle.main.path(forResource: HTML_EMBED , ofType: "html"){
+//            let fm = FileManager()
+//            let exists = fm.fileExists(atPath: path)
+//            if(exists){
+//                let c = fm.contents(atPath: path)
+//                let cString = NSString(data: c!, encoding: String.Encoding.utf8.rawValue)
+//
+//                let url = URL(string: domain)
+//
+//                var html:String = "<st";
+//                html +=  cString! as String
+//                uv.loadHTMLString(html, baseURL: url)
+//            }
+//            //test
+//
+//        }
+//    }
+//
     func ios11()  {
-        //Javascript
+        let webConfiguration = WKWebViewConfiguration();
+        // let bg = UIColor(colorWithHaxValue: colorBrand);
+//        let h = view.bounds.height ;//- mtop
+        //let frm = CGRect(x:0 , y:0, width: view.bounds.width, height: h)
+        
+        //app21: handler file local
+        webConfiguration.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
+        webConfiguration.setURLSchemeHandler(LocalSchemeHandler(), forURLScheme: "local")
+        webConfiguration.setURLSchemeHandler(LocalSchemeHandler(), forURLScheme: "js")
+        webConfiguration.setURLSchemeHandler(LocalSchemeHandler(), forURLScheme: "app21")
+        //
+        
+        wv = WKWebView(frame: .zero, configuration: webConfiguration)
+        wv.navigationDelegate = self
+        
+       
+        //wv.isHidden = true;
+        //wv.backgroundColor = bg;
+        os10 = false;
+        
+        //
+        
+    
+        
+        //
+             //Javascript
         wv.configuration.userContentController.add(self, name: "IOS")
         wv.scrollView.decelerationRate = UIScrollView.DecelerationRate.normal;
         //CGSize viewSize = self.view.frame.size
@@ -488,6 +514,24 @@ class ViewController: UIViewController,WKScriptMessageHandler,UIGestureRecognize
         let evt_Longpress = UILongPressGestureRecognizer(target: self , action: #selector(onLongpress))
         evt_Longpress.delegate = self
         wv.addGestureRecognizer(evt_Longpress)
+        
+        
+        
+        view.addSubview(wv)
+        wv.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            wv.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            view.trailingAnchor.constraint(equalTo: wv.trailingAnchor),
+            wv.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            view.bottomAnchor.constraint(equalTo: wv.bottomAnchor)
+        ])
+        //wv.scrollView.backgroundColor = .clear
+        
+        //setBackground(params: nil);
+        //view.backgroundColor = bg;
+        //view.addSubview(wv);
+        wv.backgroundColor = UIColor.white
+        
        
         
         //UI
@@ -521,57 +565,8 @@ class ViewController: UIViewController,WKScriptMessageHandler,UIGestureRecognize
             //test
             
         }
-    }
-    //MARK: - loadView
-    override func loadView() {
-       
         
-        super.loadView()
         
-       
-        if #available(iOS 11.0, *) {
-            // or use some work around
-            let webConfiguration = WKWebViewConfiguration();
-            // let bg = UIColor(colorWithHaxValue: colorBrand);
-            let h = view.bounds.height ;//- mtop
-            let frm = CGRect(x:0 , y:0, width: view.bounds.width, height: h)
-            
-            //app21: handler file local
-            webConfiguration.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
-            webConfiguration.setURLSchemeHandler(LocalSchemeHandler(), forURLScheme: "local")
-            webConfiguration.setURLSchemeHandler(LocalSchemeHandler(), forURLScheme: "js")
-            webConfiguration.setURLSchemeHandler(LocalSchemeHandler(), forURLScheme: "app21")
-            //
-            
-            wv = WKWebView(frame: .zero, configuration: webConfiguration)
-            view.addSubview(wv)
-            wv.translatesAutoresizingMaskIntoConstraints = false
-            NSLayoutConstraint.activate([
-                wv.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                view.trailingAnchor.constraint(equalTo: wv.trailingAnchor),
-                wv.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-                view.bottomAnchor.constraint(equalTo: wv.bottomAnchor)
-            ])
-            //wv.scrollView.backgroundColor = .clear
-            
-            //setBackground(params: nil);
-            //view.backgroundColor = bg;
-            view.addSubview(wv);
-            wv.backgroundColor = UIColor.white
-            
-            wv.isHidden = true;
-            //wv.backgroundColor = bg;
-            os10 = false;
-            
-            //
-            
-            
-        } else {
-            os10 = true;
-            uv.delegate = self
-        }
-        
-        //
         NotificationCenter.default.addObserver(self,
         selector: #selector(applicationDidBecomeActive),
         name: UIApplication.didBecomeActiveNotification,
@@ -589,11 +584,30 @@ class ViewController: UIViewController,WKScriptMessageHandler,UIGestureRecognize
         NotificationCenter.default.addObserver(self, selector: #selector(onNotificationClick) , name: NSNotification.Name(rawValue: "NotificationClick"), object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(onQrCode) , name: NSNotification.Name(rawValue: "QRCODE"), object: nil)
+ 
+    }
+    //MARK: - loadView
+    override func loadView() {
+       
+        
+        super.loadView()
+       
         /*
          * font
          */
         
     }
+    
+    func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        //print("Web content process terminated. Reloading...")
+        webView.reload()
+        self.dismiss(animated: false)
+        let secondViewController = self.storyboard?.instantiateViewController(withIdentifier: "Main") as! ViewController
+        secondViewController.modalPresentationStyle = .fullScreen
+                // Present the view controller modally
+                self.present(secondViewController, animated: false, completion: nil)
+    }
+    
     
     //MARK: - ScanQrCode
     @objc func onQrCode(notification: Notification)
@@ -633,20 +647,21 @@ class ViewController: UIViewController,WKScriptMessageHandler,UIGestureRecognize
     //MARK: - viewDidLoad, backgroundColor
     override func viewDidLoad() {
         super.viewDidLoad()
-        if #available(iOS 11.0, *) {
-            // or use some work around
-            ios11()
-            //!gay loi khi chay trn ipad, ko dc duyet
-            //UIApplication.shared.statusBarView?.backgroundColor = #colorLiteral(red: 0, green: 0.3529411765, blue: 0.5882352941, alpha: 1)
-            UIApplication.shared.statusBarUIView?.backgroundColor = #colorLiteral(red: 1, green: 0.537254902, blue: 0.5529411765, alpha: 1)
-        }else{
-            // for ex. UIStackView
-            ios10()
-            
-            //!gay loi khi chay trn ipad, ko dc duyet
-            //UIApplication.shared.statusBarView?.backgroundColor = #colorLiteral(red: 0, green: 0.3529411765, blue: 0.5882352941, alpha: 1)
-            UIApplication.shared.statusBarUIView?.backgroundColor = #colorLiteral(red: 1, green: 0.537254902, blue: 0.5529411765, alpha: 1)
-        }
+        ios11()
+        //!gay loi khi chay trn ipad, ko dc duyet
+        //UIApplication.shared.statusBarView?.backgroundColor = #colorLiteral(red: 0, green: 0.3529411765, blue: 0.5882352941, alpha: 1)
+        UIApplication.shared.statusBarUIView?.backgroundColor = #colorLiteral(red: 1, green: 0.537254902, blue: 0.5529411765, alpha: 1)
+//
+//        if #available(iOS 11.0, *) {
+//            // or use some work around
+//        }else{
+//            // for ex. UIStackView
+//            ios10()
+//
+//            //!gay loi khi chay trn ipad, ko dc duyet
+//            //UIApplication.shared.statusBarView?.backgroundColor = #colorLiteral(red: 0, green: 0.3529411765, blue: 0.5882352941, alpha: 1)
+//            UIApplication.shared.statusBarUIView?.backgroundColor = #colorLiteral(red: 1, green: 0.537254902, blue: 0.5529411765, alpha: 1)
+//        }
        
     }
     
@@ -660,13 +675,14 @@ class ViewController: UIViewController,WKScriptMessageHandler,UIGestureRecognize
     }
     
     func JS(cmd: String, value: String){
-        if(os10){
-            //uv.loadRequest(<#T##request: URLRequest##URLRequest#>)("app_response('\(cmd)','\(value)',true)",completionHandler: nil)
-            let str:String = "javascript:app_response('\(cmd)','\(value)',true);";
-            uv.stringByEvaluatingJavaScript(from: str)
-        }else{
-            wv.evaluateJavaScript("app_response('\(cmd)','\(value)',true)",completionHandler: nil)
-        }
+        wv.evaluateJavaScript("app_response('\(cmd)','\(value)',true)",completionHandler: nil)
+//        if(os10){
+//            //uv.loadRequest(<#T##request: URLRequest##URLRequest#>)("app_response('\(cmd)','\(value)',true)",completionHandler: nil)
+//            let str:String = "javascript:app_response('\(cmd)','\(value)',true);";
+//            uv.stringByEvaluatingJavaScript(from: str)
+//        }else{
+//
+//        }
         
     }
     
