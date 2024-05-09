@@ -36,7 +36,7 @@
 	<key>NSCalendarsUsageDescription</key>
 	<string>$(PRODUCT_NAME) calendar events</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Camera is required to use this application</string>
+	<string>Scan QR code to login</string>
 	<key>NSContactsUsageDescription</key>
 	<string>$(PRODUCT_NAME) contact use</string>
 	<key>NSFileProviderDomainUsageDescription</key>
