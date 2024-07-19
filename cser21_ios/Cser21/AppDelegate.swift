@@ -22,20 +22,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate, UNUser
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         self.configureNotification()
-        /*
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (isGranted, err) in
-            if err != nil {
-                //Something bad happend
-            } else {
-                UNUserNotificationCenter.current().delegate = self
-                Messaging.messaging().delegate = self
-                
-                DispatchQueue.main.async {
-                    UIApplication.shared.registerForRemoteNotifications()
-                }
-            }
-        }
-        */
+        
+//        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (isGranted, err) in
+//            if err != nil {
+//               // Something bad happend
+//            } else {
+//                UNUserNotificationCenter.current().delegate = self
+//                Messaging.messaging().delegate = self
+//                
+//                DispatchQueue.main.async {
+//                    UIApplication.shared.registerForRemoteNotifications()
+//                }
+//            }
+//        }
+        
         FirebaseApp.configure()
         
         // "Khó cấu hình nên fixed cứng" - 60(s) * 15
