@@ -22,21 +22,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate, UNUser
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         self.configureNotification()
+        setupPushNotificationsHandling(application)
+       
         
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (isGranted, err) in
-            if err != nil {
-               // Something bad happend
-            } else {
-                UNUserNotificationCenter.current().delegate = self
-                Messaging.messaging().delegate = self
-                
-                DispatchQueue.main.async {
-                    UIApplication.shared.registerForRemoteNotifications()
-                }
-            }
-        }
-        
-        FirebaseApp.configure()
+//        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (isGranted, err) in
+//            if err != nil {
+//               // Something bad happend
+//            } else {
+//                UNUserNotificationCenter.current().delegate = self
+//                Messaging.messaging().delegate = self
+//                
+//                DispatchQueue.main.async {
+//                    UIApplication.shared.registerForRemoteNotifications()
+//                }
+//            }
+//        }
+//        
+//        FirebaseApp.configure()
         
         // "Khó cấu hình nên fixed cứng" - 60(s) * 15
         UIApplication.shared.setMinimumBackgroundFetchInterval(60 * 15)
@@ -56,6 +58,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate, UNUser
         
         return true
     }
+    
+    private func setupPushNotificationsHandling(_ application: UIApplication) {
+        FirebaseApp.configure()
+
+        application.registerForRemoteNotifications()
+
+        UNUserNotificationCenter.current().delegate = self
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (isGranted, err) in
+            if err != nil {
+               // Something bad happend
+            } else {
+                UNUserNotificationCenter.current().delegate = self
+                Messaging.messaging().delegate = self
+                
+                DispatchQueue.main.async {
+                    UIApplication.shared.registerForRemoteNotifications()
+                }
+            }
+        }
+    }
+    
     
     func getTaskWithIdentifier() ->  String {
         let bundleID = Bundle.main.bundleIdentifier
@@ -91,6 +114,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate, UNUser
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         let deviceTokenString = deviceToken.reduce("", {$0 + String(format: "%02X", $1)})
         print("APNs device token: \(deviceTokenString)")
+        subscribeToNotificationsTopic(topic: "all")
+    }
+    func subscribeToNotificationsTopic(topic: String) {
+        // Retry until the notifications subscription is successful
+        DispatchQueue.global().async {
+            var subscribed = false
+            while !subscribed {
+                let semaphore = DispatchSemaphore(value: 0)
+                
+                InstanceID.instanceID().instanceID { (result, error) in
+                    if let result = result {
+                        // Device token can be used to send notifications exclusively to this device
+                        print("Device token \(result.token)")
+                        
+                        // Subscribe
+                        Messaging.messaging().subscribe(toTopic: topic)
+                        
+                        // Notify semaphore
+                        subscribed = true
+                        semaphore.signal()
+                    }
+                }
+                
+                // Set a 3 seconds timeout
+                let dispatchTime = DispatchTime.now() + DispatchTimeInterval.seconds(3)
+                _ = semaphore.wait(timeout: dispatchTime)
+            }
+        }
     }
     
     func ConnectToFCM() {
