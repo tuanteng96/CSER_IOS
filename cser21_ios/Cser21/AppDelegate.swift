@@ -21,62 +21,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate, UNUser
    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        self.configureNotification()
-        setupPushNotificationsHandling(application)
        
+        FirebaseApp.configure()
+        UNUserNotificationCenter.current().delegate = self
+       
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
+                    print("Quyền thông báo được cấp: \(granted)")
+                    print("Register")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        application.registerForRemoteNotifications()
+                    }
+                }
         
-//        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (isGranted, err) in
-//            if err != nil {
-//               // Something bad happend
-//            } else {
-//                UNUserNotificationCenter.current().delegate = self
-//                Messaging.messaging().delegate = self
-//                
-//                DispatchQueue.main.async {
-//                    UIApplication.shared.registerForRemoteNotifications()
-//                }
-//            }
-//        }
-//        
-//        FirebaseApp.configure()
-        
+//        self.configureNotification()
+    
         // "Khó cấu hình nên fixed cứng" - 60(s) * 15
-        UIApplication.shared.setMinimumBackgroundFetchInterval(60 * 15)
-        
-//        if #available(iOS 13.0, *) {
-//            BGTaskScheduler.shared.register(
-//                forTaskWithIdentifier: getTaskWithIdentifier(),
-//                using: DispatchQueue.global()
-//            ) { task in
-//                self.handleTaskScheduler(task)
-//            }
-//        } else {
-//            // Fallback on earlier versions
-//        }
-        //UINavigationBar.appearance().barStyle = .blackOpaque
-        
+       // UIApplication.shared.setMinimumBackgroundFetchInterval(60 * 15)
         
         return true
-    }
-    
-    private func setupPushNotificationsHandling(_ application: UIApplication) {
-        FirebaseApp.configure()
-
-        application.registerForRemoteNotifications()
-
-        UNUserNotificationCenter.current().delegate = self
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (isGranted, err) in
-            if err != nil {
-               // Something bad happend
-            } else {
-                UNUserNotificationCenter.current().delegate = self
-                Messaging.messaging().delegate = self
-                
-                DispatchQueue.main.async {
-                    UIApplication.shared.registerForRemoteNotifications()
-                }
-            }
-        }
     }
     
     
@@ -114,39 +76,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate, UNUser
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         let deviceTokenString = deviceToken.reduce("", {$0 + String(format: "%02X", $1)})
         print("APNs device token: \(deviceTokenString)")
-        subscribeToNotificationsTopic(topic: "all")
+        Messaging.messaging().apnsToken = deviceToken
+        ConnectToFCM()
     }
-    func subscribeToNotificationsTopic(topic: String) {
-        // Retry until the notifications subscription is successful
-        DispatchQueue.global().async {
-            var subscribed = false
-            while !subscribed {
-                let semaphore = DispatchSemaphore(value: 0)
-                
-                InstanceID.instanceID().instanceID { (result, error) in
-                    if let result = result {
-                        // Device token can be used to send notifications exclusively to this device
-                        print("Device token \(result.token)")
-                        
-                        // Subscribe
-                        Messaging.messaging().subscribe(toTopic: topic)
-                        
-                        // Notify semaphore
-                        subscribed = true
-                        semaphore.signal()
-                    }
-                }
-                
-                // Set a 3 seconds timeout
-                let dispatchTime = DispatchTime.now() + DispatchTimeInterval.seconds(3)
-                _ = semaphore.wait(timeout: dispatchTime)
-            }
-        }
+    
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        print("Nhận được thông báo: \(userInfo)")
+        completionHandler(.newData)
     }
+  
     
     func ConnectToFCM() {
         Messaging.messaging().shouldEstablishDirectChannel = true
         
+       
         InstanceID.instanceID().instanceID { (result, error) in
         if let error = error {
         print("Error fetching remote instange ID: \(error)")
