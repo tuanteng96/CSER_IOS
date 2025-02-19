@@ -279,8 +279,8 @@ class DownloadFileTask {
     func load(src: String, success: @escaping (_ src: String) -> (),fail: @escaping (_ mess: String) -> ()) {
         //không dùng cache ở đây(dùng localStore ở client)
         
-        let manager = Alamofire.SessionManager.default
-        let destination: DownloadRequest.DownloadFileDestination = { _, _ in
+        let manager = Alamofire.Session.default
+        let destination: DownloadRequest.Destination = { _, _ in
             
             var fn = src.split(separator: "?").first
             fn = fn?.split(separator: "/").last
@@ -305,25 +305,25 @@ class DownloadFileTask {
             //progress closure
             print(progress.fractionCompleted)
         })
-        .validate { request, response, temporaryURL, destinationURL in
+        .validate { request, response, destinationURL in
             // Custom evaluation closure now includes file URLs (allows you to parse out error messages if necessary)
             //GlobalData.sharedInstance.dismissLoader()
-            return .success
+            return .success(())
         }
         
         .responseData { response in
-            if let destinationUrl = response.destinationURL {
-                print(destinationUrl)
-                
-                
-                let local = response.destinationURL!.absoluteString;
-                //self.setCache(url: src, localPath: local)
-                success(local)
-               
-            } else {
-                //GlobalData.sharedInstance.dismissLoader()
-                fail("LOI")
-            }
+//            if let destinationUrl = response.destinationURL {
+//                print(destinationUrl)
+//                
+//                
+//                let local = response.destinationURL!.absoluteString;
+//                //self.setCache(url: src, localPath: local)
+//                success(local)
+//               
+//            } else {
+//                //GlobalData.sharedInstance.dismissLoader()
+//                fail("LOI")
+//            }
         }
     }
    
