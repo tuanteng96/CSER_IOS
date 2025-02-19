@@ -33,8 +33,6 @@ class PostFileToServer{
                 
             }, to: url, usingThreshold: UInt64.init(), method: .post, headers: headers).responseJSON(completionHandler: { (response) in
                 
-                print(response)
-                
                 if let err = response.error{
                     print(err)
                     result.success = false
@@ -43,45 +41,16 @@ class PostFileToServer{
                     return
                 }
                 
-                print("Succesfully uploaded")
-                
                 let json = response.value
-                
+                let jsonStr = String(data: response.data!, encoding: String.Encoding.utf8)
+
                 if (json != nil)
                 {
-                    let jsonObject = JSON(json!)
                     result.success = true;
-                    result.data = jsonObject
+                    result.data = JSON(jsonStr) ;//JSON(json!)
                     self.app21?.App21Result(result: result)
                 }
             })
-//            AF.upload(multipartFormData: { (multipartFormData) in
-//                let down = DownloadFileTask()
-//                let fn = down.getName(path: pinfo.path!)
-//                let data = down.localToData(filePath: pinfo.path!)
-//                //multipartFormData.append(data, withName: "image", fileName: "image.png", mimeType: "image/png")
-//                multipartFormData.append(data, withName: "file", fileName: fn, mimeType: "file/*")
-//                
-//            }, to: url, usingThreshold: UInt64.init(), method: .post, headers: headers) { (rsp) in
-//                switch rsp{
-//                case .success(let upload, _, _):
-//                    
-//                   
-//                    upload.responseString { (rsp: DataResponse<String>) in
-//                        result.success = true;
-//                        result.data = JSON(rsp.value!)
-//                        self.app21?.App21Result(result: result)
-//                    }
-//                    
-//                case .failure(let error):
-//                    //print("Error in upload: \(error.localizedDescription)")
-//                    //onError?(error)
-//                    result.success = false
-//                    result.error = error.localizedDescription
-//                    self.app21?.App21Result(result: result)
-//                }
-//                
-//            }
         }
         catch{
             
