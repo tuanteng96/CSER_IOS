@@ -9,7 +9,6 @@
 import UIKit
 import FirebaseCore
 import FirebaseMessaging
-import FirebaseInstanceID
 import UserNotifications
 import BackgroundTasks
 
@@ -24,17 +23,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate, UNUser
         // Override point for customization after application launch.
        
         FirebaseApp.configure()
+        Messaging.messaging().delegate = self
         UNUserNotificationCenter.current().delegate = self
-        DispatchQueue.main.asyncAfter(deadline: .now() ) {
-            UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
-                        print("Quyền thông báo được cấp: \(granted)")
-                        print("Register")
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                            UIApplication.shared.registerForRemoteNotifications()
-                            UIApplication.shared.applicationIconBadgeNumber = 0
-                        }
-                    }
-        }
+
+        requestNotificationAuthorization()
+
+//        UNUserNotificationCenter.current().delegate = self
+//        DispatchQueue.main.asyncAfter(deadline: .now() ) {
+//            UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
+//                        print("Quyền thông báo được cấp: \(granted)")
+//                        print("Register")
+//                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+//                            UIApplication.shared.registerForRemoteNotifications()
+//                            UIApplication.shared.applicationIconBadgeNumber = 0
+//                        }
+//                    }
+//        }
        
        
         
@@ -45,6 +49,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate, UNUser
         
         return true
     }
+    
+    func requestNotificationAuthorization() {
+            UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+                if let error = error {
+                    print("❌ Error: \(error)")
+                }
+                print("🔔 Notification permission: \(granted)")
+                if granted {
+                    DispatchQueue.main.async {
+                        UIApplication.shared.registerForRemoteNotifications()
+                    }
+                }
+            }
+        }
+
     
     
     func getTaskWithIdentifier() ->  String {
@@ -94,16 +113,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate, UNUser
     func ConnectToFCM() {
         Messaging.messaging().token { token, error in
             if let error = error {
-                print("Error fetching FCM registration token: \(error)")
+                print("❌ Lỗi lấy FCM token: \(error)")
             } else if let token = token {
-                print("Remote instance ID token: \(token)")
-                //hung 19/03/2022
-                let defaults = UserDefaults.standard
-                defaults.set(token, forKey: "FirebaseNotiToken")
-                // Đăng ký token nhận thông báo
+                print("✅ FCM Token: \(token)")
+                UserDefaults.standard.set(token, forKey: "FirebaseNotiToken")
             }
         }
-       
     }
     
     func applicationWillResignActive(_ application: UIApplication) {
