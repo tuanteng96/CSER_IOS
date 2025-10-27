@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#import "GoogleUtilities/Environment/Private/GULSecureCoding.h"
+#import "GoogleUtilities/Environment/Public/GoogleUtilities/GULSecureCoding.h"
 
 NSString *const kGULSecureCodingError = @"GULSecureCodingError";
 
@@ -53,10 +53,10 @@ NSString *const kGULSecureCodingError = @"GULSecureCodingError";
   return object;
 }
 
-+ (nullable id)unarchivedObjectOfClass:(Class)class
++ (nullable id)unarchivedObjectOfClass:(Class)aClass
                               fromData:(NSData *)data
                                  error:(NSError **)outError {
-  return [self unarchivedObjectOfClasses:[NSSet setWithObject:class] fromData:data error:outError];
+  return [self unarchivedObjectOfClasses:[NSSet setWithObject:aClass] fromData:data error:outError];
 }
 
 + (nullable NSData *)archivedDataWithRootObject:(id<NSCoding>)object error:(NSError **)outError {

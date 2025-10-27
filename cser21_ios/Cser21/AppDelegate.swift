@@ -239,17 +239,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
-        // 🔹 1. Thiết lập thông báo trước
+        // 1️⃣ Cấu hình Firebase
+        FirebaseApp.configure()
+
+        // 2️⃣ Thiết lập delegate
         UNUserNotificationCenter.current().delegate = self
+        Messaging.messaging().delegate = self
+
+        // 3️⃣ Xin quyền thông báo
         requestNotificationAuthorization()
         registerNotificationCategory()
 
-        // 🔹 2. Cấu hình Firebase sau khi đăng ký thông báo
-        FirebaseApp.configure()
-        Messaging.messaging().delegate = self
-        Messaging.messaging().isAutoInitEnabled = true
-
-        // 🔹 3. Đăng ký background task
+        // 4️⃣ Cấu hình background task
         setupBackgroundTask()
 
         return true
@@ -271,7 +272,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
     }
 
-    // MARK: - Register Notification Category
     func registerNotificationCategory() {
         let category = UNNotificationCategory(
             identifier: "App21CustomPush",
@@ -330,11 +330,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         let deviceTokenString = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
         print("📱 APNs Device Token: \(deviceTokenString)")
 
-        // ✅ Gán APNs token cho Firebase
+        // Gán APNs token cho Firebase
         Messaging.messaging().apnsToken = deviceToken
-        Messaging.messaging().shouldEstablishDirectChannel = true
 
-        // ✅ Gọi ConnectToFCM sau khi có APNs token
+        // Gọi sau khi APNs token đã set
         ConnectToFCM()
     }
 
@@ -352,7 +351,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         UserDefaults.standard.set(fcmToken, forKey: "FirebaseNotiToken")
     }
 
-    // MARK: - Xử lý thông báo đến
+    // MARK: - Nhận thông báo
     func application(_ application: UIApplication,
                      didReceiveRemoteNotification userInfo: [AnyHashable : Any],
                      fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
@@ -384,14 +383,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         completionHandler()
     }
 
-    // MARK: - FCM Token kết nối
+    // MARK: - Kết nối FCM sau khi có APNs
     func ConnectToFCM() {
-        guard let apnsToken = Messaging.messaging().apnsToken else {
+        guard let _ = Messaging.messaging().apnsToken else {
             print("⚠️ APNs token chưa sẵn sàng, hoãn lấy FCM token.")
             return
         }
-
-        print("📱 APNs token đã có: \(apnsToken)")
 
         Messaging.messaging().token { token, error in
             if let error = error {

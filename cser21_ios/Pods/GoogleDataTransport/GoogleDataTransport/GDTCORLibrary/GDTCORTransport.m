@@ -17,7 +17,7 @@
 #import "GoogleDataTransport/GDTCORLibrary/Public/GoogleDataTransport/GDTCORTransport.h"
 #import "GoogleDataTransport/GDTCORLibrary/Private/GDTCORTransport_Private.h"
 
-#import "GoogleDataTransport/GDTCORLibrary/Public/GoogleDataTransport/GDTCORAssert.h"
+#import "GoogleDataTransport/GDTCORLibrary/Internal/GDTCORAssert.h"
 #import "GoogleDataTransport/GDTCORLibrary/Public/GoogleDataTransport/GDTCORClock.h"
 #import "GoogleDataTransport/GDTCORLibrary/Public/GoogleDataTransport/GDTCOREvent.h"
 
@@ -69,6 +69,10 @@
 
 - (GDTCOREvent *)eventForTransport {
   return [[GDTCOREvent alloc] initWithMappingID:_mappingID target:_target];
+}
+
+- (GDTCOREvent *)eventForTransportWithProductData:(GDTCORProductData *)productData {
+  return [[GDTCOREvent alloc] initWithMappingID:_mappingID productData:productData target:_target];
 }
 
 #pragma mark - Private helper methods
