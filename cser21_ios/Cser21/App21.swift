@@ -46,10 +46,8 @@ class App21 : NSObject, MFMessageComposeViewControllerDelegate
                self.caller.evalJs(str: "App21Result('BASE64:" + base64! + "')");
            })
         } catch  {
-            //
             NSLog("App21Result -> " + error.localizedDescription);
         }
-        
     }
     
     //MARK: - call
@@ -557,12 +555,9 @@ class App21 : NSObject, MFMessageComposeViewControllerDelegate
                 composer.messageComposeDelegate = self
                 composer.recipients = [sms.phone]
                 composer.body = sms.body
+                composer.modalPresentationStyle = .fullScreen
                 self.pendingSMSResult = result
-                self.caller.present(composer, animated: true, completion: {
-                    if let callback = sms.callback, !callback.isEmpty {
-                        self.caller.evalJs(str: "\(callback)()")
-                    }
-                })
+                self.caller.present(composer, animated: false, completion: nil)
             } else {
                 result.success = false;
                 result.error = "CANNOT_SEND_SMS";
@@ -571,24 +566,29 @@ class App21 : NSObject, MFMessageComposeViewControllerDelegate
         }
     }
 
-    func messageComposeViewController(_ controller: MFMessageComposeViewController, didFinishWith messageComposeResult: MessageComposeResult) {
+    @objc func messageComposeViewController(_ controller: MFMessageComposeViewController, didFinishWith messageComposeResult: MessageComposeResult) {
+        NSLog("SEND_SMS didFinishWith result: %d", messageComposeResult.rawValue)
         controller.dismiss(animated: true) {
             guard let smsResult = self.pendingSMSResult else {
+                NSLog("SEND_SMS didFinishWith: pendingSMSResult is nil")
                 return
             }
             self.pendingSMSResult = nil
             switch messageComposeResult {
             case .sent:
                 smsResult.success = true
-                smsResult.data = JSON("sent")
+                smsResult.data = JSON("SENT")
             case .cancelled:
                 smsResult.success = false
+                smsResult.data = JSON("CANCELLED")
                 smsResult.error = "CANCELLED"
             case .failed:
                 smsResult.success = false
+                smsResult.data = JSON("FAILED")
                 smsResult.error = "FAILED"
             @unknown default:
                 smsResult.success = false
+                smsResult.data = JSON("UNKNOWN")
                 smsResult.error = "UNKNOWN"
             }
             self.App21Result(result: smsResult)
