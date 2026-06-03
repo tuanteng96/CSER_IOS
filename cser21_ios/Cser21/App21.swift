@@ -11,10 +11,12 @@ import MobileCoreServices
 import AVFoundation
 import Photos
 import AudioToolbox
+import MessageUI
 
-class App21 : NSObject
+class App21 : NSObject, MFMessageComposeViewControllerDelegate
 {
     var caller:  ViewController
+    var pendingSMSResult: Result? = nil
     init(viewController: ViewController)
     {
         caller = viewController;
@@ -344,6 +346,35 @@ class App21 : NSObject
         }
         return d;
     }
+
+    func parseSMSParams(_ params: String?) -> (phone: String, body: String, callback: String?)? {
+        guard let params = params else {
+            return nil
+        }
+        if let data = params.data(using: .utf8) {
+            if let raw = try? JSONSerialization.jsonObject(with: data, options: []), let json = raw as? [String: Any] {
+                let phone = (json["phone"] as? String) ?? (json["number"] as? String) ?? ""
+                let body = (json["text"] as? String) ?? (json["message"] as? String) ?? ""
+                let callback = (json["callback"] as? String) ?? (json["js_callback"] as? String)
+                if !phone.isEmpty {
+                    return (phone, body, callback)
+                }
+            }
+        }
+        let parts = params.split(separator: ",").map { String($0) }
+        var dict = [String: String]()
+        for part in parts {
+            let kv = part.split(separator: ":", maxSplits: 1).map { String($0) }
+            if kv.count == 2 {
+                dict[kv[0].trimmingCharacters(in: .whitespacesAndNewlines)] = kv[1]
+            }
+        }
+        if let phone = dict["phone"] ?? dict["number"], !phone.isEmpty {
+            let callback = dict["callback"] ?? dict["js_callback"]
+            return (phone, dict["text"] ?? dict["message"] ?? "", callback)
+        }
+        return nil
+    }
     
     func reject(result: Result, resson: String)
     {
@@ -514,12 +545,55 @@ class App21 : NSObject
     
     //MARK: - SEND_SMS
     @objc func SEND_SMS(result: Result) -> Void{
-        
-        result.success = false;
-        result.error = "NO_SUPPORT";
-        App21Result(result: result)
+        guard let sms = parseSMSParams(result.params) else {
+            result.success = false;
+            result.error = "INVALID_PARAMS";
+            App21Result(result: result)
+            return
+        }
+        DispatchQueue.main.async {
+            if MFMessageComposeViewController.canSendText() {
+                let composer = MFMessageComposeViewController()
+                composer.messageComposeDelegate = self
+                composer.recipients = [sms.phone]
+                composer.body = sms.body
+                self.pendingSMSResult = result
+                self.caller.present(composer, animated: true, completion: {
+                    if let callback = sms.callback, !callback.isEmpty {
+                        self.caller.evalJs(str: "\(callback)()")
+                    }
+                })
+            } else {
+                result.success = false;
+                result.error = "CANNOT_SEND_SMS";
+                self.App21Result(result: result)
+            }
+        }
     }
-    
+
+    func messageComposeViewController(_ controller: MFMessageComposeViewController, didFinishWith messageComposeResult: MessageComposeResult) {
+        controller.dismiss(animated: true) {
+            guard let smsResult = self.pendingSMSResult else {
+                return
+            }
+            self.pendingSMSResult = nil
+            switch messageComposeResult {
+            case .sent:
+                smsResult.success = true
+                smsResult.data = JSON("sent")
+            case .cancelled:
+                smsResult.success = false
+                smsResult.error = "CANCELLED"
+            case .failed:
+                smsResult.success = false
+                smsResult.error = "FAILED"
+            @unknown default:
+                smsResult.success = false
+                smsResult.error = "UNKNOWN"
+            }
+            self.App21Result(result: smsResult)
+        }
+    }
     
     //MARK: - GET_PHONE
     @objc func GET_PHONE(result: Result) -> Void{

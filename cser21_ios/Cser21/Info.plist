@@ -81,5 +81,21 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoadsForMedia</key>
+        <true/>
+    </dict>
+    <key>WKAppBoundDomains</key>
+    <array>
+        <string>youtube.com</string>
+        <string>www.youtube.com</string>
+        <string>m.youtube.com</string>
+        <string>ytimg.com</string>
+        <string>i.ytimg.com</string>
+        <string>s.ytimg.com</string>
+        <string>googlevideo.com</string>
+        <string>*.googlevideo.com</string>
+    </array>
 </dict>
 </plist>
