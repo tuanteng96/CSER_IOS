@@ -466,7 +466,12 @@ class ViewController: UIViewController,WKScriptMessageHandler,UIGestureRecognize
         webConfiguration.setURLSchemeHandler(LocalSchemeHandler(), forURLScheme: "app21")
         //
         
-        wv = WKWebView(frame: .zero, configuration: webConfiguration)
+        wv = WKWebView(frame: .zero, configuration: webConfiguration);
+        
+        if #available(iOS 16.4, *) {
+            wv.isInspectable = true
+        }
+        
         wv.navigationDelegate = self
         
        

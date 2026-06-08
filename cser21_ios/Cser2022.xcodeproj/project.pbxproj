@@ -32,7 +32,7 @@
 		34B7779C241B82EB00787FE3 /* Cser21Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B7779B241B82EB00787FE3 /* Cser21Tests.swift */; };
 		34B777A7241B82EB00787FE3 /* Cser21UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B777A6241B82EB00787FE3 /* Cser21UITests.swift */; };
 		3B1DC5BB4703A8A03C0702CC /* Pods_Cser2022.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F8AE250677EFB4508DCDB142 /* Pods_Cser2022.framework */; };
-		B7520C6927577DEC00A49021 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B7520C6827577DEC00A49021 /* GoogleService-Info.plist */; };
+		B751AD822FD4876D00CB767B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B751AD812FD4876D00CB767B /* GoogleService-Info.plist */; };
 		C7F581CC93A49C36E2F63285 /* Pods_Cser2022_Cser2022UITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B5DB964836B4DB6F92B3A5C /* Pods_Cser2022_Cser2022UITests.framework */; };
 		E76E4EEF43C6BD07E0FAB2E8 /* Pods_Cser2022Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AE4D29C8A146B1D475BE173 /* Pods_Cser2022Tests.framework */; };
 		EF94C6E9277D500E0015CCA5 /* QrCodeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF94C6E8277D500E0015CCA5 /* QrCodeController.swift */; };
@@ -112,7 +112,7 @@
 		62EE991432C39832C715D722 /* Pods-Cser2022-Cser2022UITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cser2022-Cser2022UITests.debug.xcconfig"; path = "Target Support Files/Pods-Cser2022-Cser2022UITests/Pods-Cser2022-Cser2022UITests.debug.xcconfig"; sourceTree = "<group>"; };
 		8CA8E4C068CEE3AA4463163A /* Pods-Cser2022Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cser2022Tests.debug.xcconfig"; path = "Target Support Files/Pods-Cser2022Tests/Pods-Cser2022Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		933880EE26CF8B0891941F5E /* Pods-Cser2022Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cser2022Tests.release.xcconfig"; path = "Target Support Files/Pods-Cser2022Tests/Pods-Cser2022Tests.release.xcconfig"; sourceTree = "<group>"; };
-		B7520C6827577DEC00A49021 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
+		B751AD812FD4876D00CB767B /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		EF94C6E8277D500E0015CCA5 /* QrCodeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QrCodeController.swift; sourceTree = "<group>"; };
 		F8AE250677EFB4508DCDB142 /* Pods_Cser2022.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Cser2022.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -193,7 +193,6 @@
 		34B77785241B82EA00787FE3 /* Cser21 */ = {
 			isa = PBXGroup;
 			children = (
-				B7520C6827577DEC00A49021 /* GoogleService-Info.plist */,
 				18D1BE3F24558950001B95F7 /* fonts */,
 				183E4580244AEBD700E6AB75 /* embed21.html */,
 				349088F9241B8A3D004AD9A0 /* embed.html */,
@@ -219,6 +218,7 @@
 				18AB495724505FB2005598C2 /* WebControl.swift */,
 				18A28FEE2450A39C00EEEB7A /* Record21.swift */,
 				EF94C6E8277D500E0015CCA5 /* QrCodeController.swift */,
+				B751AD812FD4876D00CB767B /* GoogleService-Info.plist */,
 			);
 			path = Cser21;
 			sourceTree = "<group>";
@@ -377,7 +377,7 @@
 				183E4581244AEBD800E6AB75 /* embed21.html in Resources */,
 				34B7778E241B82EB00787FE3 /* Assets.xcassets in Resources */,
 				34B7778C241B82EA00787FE3 /* Main.storyboard in Resources */,
-				B7520C6927577DEC00A49021 /* GoogleService-Info.plist in Resources */,
+				B751AD822FD4876D00CB767B /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

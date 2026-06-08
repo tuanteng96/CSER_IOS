@@ -200,6 +200,8 @@ class QrCodeController: UIViewController, UIImagePickerControllerDelegate, UINav
         
         view.backgroundColor = .black
         qrCodeView.backgroundColor = .clear
+        qrCodeView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        qrCodeView.frame = view.bounds
 
         
         // Get the back-facing camera for capturing videos
@@ -253,6 +255,7 @@ class QrCodeController: UIViewController, UIImagePickerControllerDelegate, UINav
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        qrCodeView.frame = view.bounds
         videoPreviewLayer?.frame = view.bounds
         if !overlayAdded {
             setupScanOverlay()
@@ -262,7 +265,8 @@ class QrCodeController: UIViewController, UIImagePickerControllerDelegate, UINav
     }
 
     private func updateScanOverlayFrames() {
-        guard let bounds = view?.bounds,
+        let bounds = qrCodeView.bounds
+        guard !bounds.isEmpty,
               let overlay = scanOverlay,
               let scanArea = scanAreaView,
               let scanLine = scanLine else { return }
@@ -293,7 +297,8 @@ class QrCodeController: UIViewController, UIImagePickerControllerDelegate, UINav
 
     private func setupScanOverlay() {
         overlayAdded = true
-        guard let bounds = view?.bounds else { return }
+        let bounds = qrCodeView.bounds
+        guard !bounds.isEmpty else { return }
         let overlay = UIView(frame: bounds)
         // make overlay a bit darker
         overlay.backgroundColor = UIColor(white: 0, alpha: 0.7)
